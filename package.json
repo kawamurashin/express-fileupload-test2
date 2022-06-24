@@ -1,0 +1,12 @@
+{
+  "name": "express-fileupload-test2",
+  "version": "0.1.0",
+  "author":  "Kawamura Shin <kawamura@mztm.jp> (https://github.com/kawamurashin/)",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn build:express && yarn build:vue",
+    "build:express" : "cd express && yarn build",
+    "build:vue" : "cd vue-project && yarn build:index",
+    "start": "cd express && yarn start"
+  }
+}

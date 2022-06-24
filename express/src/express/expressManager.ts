@@ -59,6 +59,7 @@ export class ExpressManager extends EventEmitter {
                 const minute: string = String(date.getMinutes() + 100).substring(1);
                 const second: string = String(date.getSeconds() + 100).substring(1);
                 const name: string = year + month + day + hour + minute + second + "-" + countStr + "." + extension;
+
                 cb(null, name)
             }
         })
@@ -73,6 +74,34 @@ export class ExpressManager extends EventEmitter {
                 if (err) throw err;
                 res.json({"status": "ok"});
             });
+        })
+        app.post('/images_post', upload.array('files'), function (req: any, res: any, next: Function) {
+            const header: string = req.body.message
+            let files:any[] = req.files;
+            let completeCount = 0;
+            let n = files.length;
+            for(let i= 0;i<n;i++)
+            {
+                const file:string = files[i].filename;
+                const filename = path.join(ExpressManager.UPLOAD_DIR , file);
+                const rename = path.join(ExpressManager.UPLOAD_DIR, header + "-" + file);
+                fs.rename(filename, rename, err => {
+                    if (err) throw err;
+                    console.log("hoge " + i)
+                    completeCount++
+                    if(completeCount == n)
+                    {
+                        res.json({"status": "ok"});
+                    }
+
+                });
+            }
+
+
+            //const filenames = path.join(ExpressManager.UPLOAD_DIR, req.files);
+            //console.log(filenames)
+            //const rename = path.join(ExpressManager.UPLOAD_DIR, header + "-" + req.file.filename);
+
         })
 
 

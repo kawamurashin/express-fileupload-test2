@@ -42,15 +42,16 @@ export default defineComponent({
   },
   methods: {
     clickHandler(e: any) {
-      console.log("e " + e.target)
-      console.log("click")
       let formData = new FormData();
 
-      formData.append("file", this.files[0])
+      for (let i = 0; i < this.files.length; i++) {
+        formData.append('files', this.files[i]);
+      }
+      //formData.append("file", this.files[0])
       formData.append("message",this.message)
 
       try{
-        axios.post('image_post',
+        axios.post('images_post',
             formData,
             {
               headers: {
@@ -64,10 +65,6 @@ export default defineComponent({
       {
         console.log('FAILURE!!');
       }
-
-
-
-
 
 
     },

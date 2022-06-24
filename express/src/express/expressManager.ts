@@ -1,13 +1,16 @@
 import express = require("express");
 import EventEmitter = require("events");
 
+const path = require("path");
 const fs = require('fs');
 const multer = require('multer');
 const bodyParser = require('body-parser')
-let PORT: number = 9320;
+let PORT: number = 9300;
 import {createServer} from "http";
 
 export class ExpressManager extends EventEmitter {
+    private static UPLOAD_DIR: string = "dist/uploads";
+
     constructor() {
         super();
     }
@@ -35,24 +38,41 @@ export class ExpressManager extends EventEmitter {
             res.json({"status": "ok"});
         });
 
+        let count: number = 0;
         const storage = multer.diskStorage({
             destination: function (req, file, cb) {
-                cb(null, 'dist/uploads/')
+                cb(null, ExpressManager.UPLOAD_DIR)
             },
             filename: function (req, file, cb) {
-                cb(null, file.originalname)
+                count++;
+                if (count >= 1000) {
+                    count = count - 1000;
+                }
+                const countStr = String(1000 + count).substring(1);
+                const list: string[] = file.originalname.split(".");
+                const extension = list[list.length - 1]
+                const date: Date = new Date();
+                const year: string = String(date.getFullYear());
+                const month: string = String(date.getMonth() + 1 + 100).substring(1);
+                const day: string = String(date.getDate() + 100).substring(1);
+                const hour: string = String(date.getHours() + 100).substring(1);
+                const minute: string = String(date.getMinutes() + 100).substring(1);
+                const second: string = String(date.getSeconds() + 100).substring(1);
+                const name: string = year + month + day + hour + minute + second + "-" + countStr + "." + extension;
+                cb(null, name)
             }
         })
         const upload = multer({storage: storage})
 
 
         app.post('/image_post', upload.single('file'), function (req: any, res: any, next: Function) {
-            console.log(req.body.message)
-            const filename = req.file.filename
-            console.log(filename)
-            //const content = fs.readFileSync(req.file.path, 'utf-8');
-            res.json({"status": "ok"});
-
+            const header: string = req.body.message
+            const filename = path.join(ExpressManager.UPLOAD_DIR, req.file.filename);
+            const rename = path.join(ExpressManager.UPLOAD_DIR, header + "-" + req.file.filename);
+            fs.rename(filename, rename, err => {
+                if (err) throw err;
+                res.json({"status": "ok"});
+            });
         })
 
 

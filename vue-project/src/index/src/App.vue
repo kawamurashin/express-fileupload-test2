@@ -45,9 +45,9 @@ export default defineComponent({
       console.log("e " + e.target)
       console.log("click")
       let formData = new FormData();
-      console.log("this.files[0] " + this.files[0])
+
       formData.append("file", this.files[0])
-      formData.append("message","message " + this.message)
+      formData.append("message",this.message)
 
       try{
         axios.post('image_post',
